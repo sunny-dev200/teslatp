@@ -1,0 +1,246 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local gui = Instance.new("ScreenGui", game.CoreGui)
+
+local totalTime = 600
+local joinTime = tick()
+
+local toggleButton = Instance.new("TextButton", gui)
+toggleButton.Size = UDim2.new(0, 100, 0, 30)
+toggleButton.Position = UDim2.new(0, 10, 0.25, 0)
+toggleButton.Text = "Toggle GUI"
+toggleButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+toggleButton.TextColor3 = Color3.new(1,1,1)
+toggleButton.ZIndex = 5
+
+local mainFrame = Instance.new("Frame", gui)
+mainFrame.Size = UDim2.new(0, 270, 0, 400)
+mainFrame.Position = UDim2.new(0.05, 0, 0.3, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.Active = true
+mainFrame.Draggable = true
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 8)
+
+local tabButtons = Instance.new("Frame", mainFrame)
+tabButtons.Size = UDim2.new(1, 0, 0, 30)
+tabButtons.BackgroundTransparency = 1
+
+local infoTabButton = Instance.new("TextButton", tabButtons)
+infoTabButton.Size = UDim2.new(1/3, 0, 1, 0)
+infoTabButton.Text = "Info"
+
+local mainTabButton = Instance.new("TextButton", tabButtons)
+mainTabButton.Position = UDim2.new(1/3, 0, 0, 0)
+mainTabButton.Size = UDim2.new(1/3, 0, 1, 0)
+mainTabButton.Text = "Main"
+
+local tpTabButton = Instance.new("TextButton", tabButtons)
+tpTabButton.Position = UDim2.new(2/3, 0, 0, 0)
+tpTabButton.Size = UDim2.new(1/3, 0, 1, 0)
+tpTabButton.Text = "TP"
+
+local infoTab = Instance.new("Frame", mainFrame)
+infoTab.Position = UDim2.new(0, 0, 0, 30)
+infoTab.Size = UDim2.new(1, 0, 1, -30)
+infoTab.BackgroundColor3 = Color3.fromRGB(40,40,40)
+
+local credit = Instance.new("TextLabel", infoTab)
+credit.Size = UDim2.new(1, -10, 0, 60)
+credit.Position = UDim2.new(0, 5, 0, 10)
+credit.TextWrapped = true
+credit.TextColor3 = Color3.new(1, 1, 1)
+credit.Text = "Script by: XuanVP - Sunny - Idk - NyricX"
+credit.BackgroundTransparency = 1
+
+local function createCopyButton(text, posY, link)
+    local btn = Instance.new("TextButton", infoTab)
+    btn.Size = UDim2.new(0.8, 0, 0, 30)
+    btn.Position = UDim2.new(0.1, 0, 0, posY)
+    btn.Text = text
+    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    Instance.new("UICorner", btn)
+    btn.MouseButton1Click:Connect(function()
+        setclipboard(link)
+    end)
+end
+
+createCopyButton("Copy XuanVP Discord", 80, "https://discord.gg/usv255Pw4t")
+createCopyButton("Copy NyricX Discord", 120, "https://discord.gg/yA9JVRMEkW")
+createCopyButton("Copy YTB Sunny", 160, "https://www.youtube.com/@SunPowerPew")
+
+local mainTab = Instance.new("Frame", mainFrame)
+mainTab.Position = UDim2.new(0, 0, 0, 30)
+mainTab.Size = UDim2.new(1, 0, 1, -30)
+mainTab.BackgroundColor3 = Color3.fromRGB(40,40,40)
+mainTab.Visible = false
+
+local tpTab = Instance.new("Frame", mainFrame)
+tpTab.Position = UDim2.new(0, 0, 0, 30)
+tpTab.Size = UDim2.new(1, 0, 1, -30)
+tpTab.BackgroundColor3 = Color3.fromRGB(40,40,40)
+tpTab.Visible = false
+
+infoTabButton.MouseButton1Click:Connect(function()
+    infoTab.Visible = true
+    mainTab.Visible = false
+    tpTab.Visible = false
+end)
+
+mainTabButton.MouseButton1Click:Connect(function()
+    infoTab.Visible = false
+    mainTab.Visible = true
+    tpTab.Visible = false
+end)
+
+tpTabButton.MouseButton1Click:Connect(function()
+    infoTab.Visible = false
+    mainTab.Visible = false
+    tpTab.Visible = true
+end)
+
+local visible = true
+mainFrame.Visible = true
+
+toggleButton.MouseButton1Click:Connect(function()
+    visible = not visible
+    mainFrame.Visible = visible
+    infoTab.Visible = visible and (infoTab.Visible or true)
+    mainTab.Visible = visible and mainTab.Visible
+    tpTab.Visible = visible and tpTab.Visible
+end)
+
+local countdown = Instance.new("TextLabel", gui)
+countdown.Size = UDim2.new(0, 150, 0, 25)
+countdown.Position = UDim2.new(0.5, -75, 0, 20)
+countdown.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+countdown.BackgroundTransparency = 0.3
+countdown.TextColor3 = Color3.new(1, 1, 1)
+countdown.TextScaled = true
+countdown.Text = "10:00"
+countdown.Active = true
+countdown.Draggable = true
+
+spawn(function()
+	while true do
+		local elapsed = tick() - joinTime
+		local remaining = math.max(totalTime - elapsed, 0)
+		local min = math.floor(remaining / 60)
+		local sec = math.floor(remaining % 60)
+		countdown.Text = string.format("%02d:%02d", min, sec)
+		if remaining <= 0 then break end
+		wait(1)
+	end
+end)
+
+local function createButton(text, posY, parent, callback)
+    local btn = Instance.new("TextButton", parent)
+    btn.Size = UDim2.new(1, -20, 0, 30)
+    btn.Position = UDim2.new(0, 10, 0, posY)
+    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextSize = 16
+    btn.Text = text
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    btn.MouseButton1Click:Connect(callback)
+end
+
+createButton("Teleport to End", 10, tpTab, function()
+    task.spawn(function()
+        for i = 1, 10 do
+            local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+            local hrp = char:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                hrp.CFrame = CFrame.new(-424.40799, 26, -49040.043)
+            end
+            task.wait(0.2)
+        end
+    end)
+end)
+
+createButton("Teleport to End 2", 50, tpTab, function()
+    task.spawn(function()
+        local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+        local humanoid = character:WaitForChild("Humanoid")
+        local hrp = character:WaitForChild("HumanoidRootPart")
+        local originalJumpPower = humanoid.JumpPower
+        hrp.CFrame = CFrame.new(-424.40799, 28.1134377, -49040.043)
+        hrp.Anchored = true
+        humanoid.WalkSpeed = 0
+        humanoid.JumpPower = 0
+        local moveTime = 3
+        local startTime = tick()
+        while tick() - startTime < moveTime do
+            humanoid:Move(hrp.CFrame.LookVector, false)
+            task.wait()
+        end
+        humanoid:Move(Vector3.zero, false)
+        task.wait(1.5)
+        hrp.CFrame = hrp.CFrame * CFrame.new(0.1, -0.1, 0.1)
+        hrp.Anchored = false
+        humanoid.WalkSpeed = 16
+        humanoid.JumpPower = originalJumpPower
+    end)
+end)
+
+createButton("Teleport to Train", 90, tpTab, function()
+    local train = workspace:FindFirstChild("Train")
+    local conductorSeat = train and train:FindFirstChild("TrainControls") and train.TrainControls:FindFirstChild("ConductorSeat")
+    local vehicleSeat = conductorSeat and conductorSeat:FindFirstChild("VehicleSeat")
+    if train and conductorSeat and vehicleSeat then
+        local success, result = pcall(function()
+            local oldPos = vehicleSeat:GetPivot()
+            local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
+            local humanoidRootPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if not (humanoid and humanoidRootPart) then return end
+            humanoidRootPart.CFrame = vehicleSeat.CFrame
+            humanoid:Sit(vehicleSeat)
+            local startTime = tick()
+            while tick() - startTime < 5 do
+                if vehicleSeat:FindFirstChild("SeatWeld") then
+                    vehicleSeat:PivotTo(oldPos)
+                    return
+                end
+                task.wait(0.01)
+            end
+        end)
+        if not success or not result then warn("Teleport failed") end
+    else
+        warn("Train seat not found")
+    end
+end)
+
+createButton("Teleport To Tesla", 190, tpTab,
+function()
+
+loadstring(game:HttpGet('https://raw.githubusercontent.com/sunny-dev200/teslatp/refs/heads/main/Deadrails'))()
+
+createButton("Toggle NoClip", 10, mainTab, function()
+    RunService.Stepped:Connect(function()
+        for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    end)
+end)
+
+createButton("Toggle Gun Aura", 50, mainTab, function()
+    loadstring(game:HttpGet('https://hst.sh/raw/qosonenino'))()
+end)
+
+createButton("Instant Horse Class", 90, mainTab, function()
+    local args = { [1] = "Horse" }
+    ReplicatedStorage:WaitForChild("Shared"):WaitForChild("RemotePromise"):WaitForChild("Remotes"):WaitForChild("C_BuyClass"):FireServer(unpack(args))
+end)
+
+createButton("Third Person", 130, mainTab, function()
+    local player = game.Players.LocalPlayer
+    player.CameraMode = Enum.CameraMode.Classic
+    player.CameraMaxZoomDistance = 100
+end)
+
+loadstring(game:HttpGet("https://hst.sh/raw/otixowicad"))()
